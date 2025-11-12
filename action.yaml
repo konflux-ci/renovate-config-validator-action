@@ -19,7 +19,7 @@ runs:
       run: |
         set -eu
 
-        if [ -f $CONFIG_FILE_PATH ]; then
+        if [ -n "$CONFIG_FILE_PATH" ] && [ -f "$CONFIG_FILE_PATH" ]; then
           echo "Validating config_file: " "$CONFIG_FILE_PATH"
           
           config_path="$(pwd)/$CONFIG_FILE_PATH"
@@ -42,12 +42,16 @@ runs:
 
         fi
         
+        echo "No config file was set"
+        echo "Detecting renovate configuration files..."
+
         mkdir /tmp/renovate-configs
 
-        renovate_file=$(find . -name "*renovate*")
+        renovate_files=$(find . -name "*renovate.json*")
 
         for f in $renovate_files; do
           if [ -f $f ]; then
+            echo "Renovate file detected: $f"
             cp $f /tmp/renovate-configs
           fi
         done 
@@ -56,11 +60,15 @@ runs:
           echo "No config files found"
           exit 1
         fi
-
+        
+        ls -l /tmp/renovate-configs
         podman run --rm \
-        -v /tmp/renovate-configs:/workspace/renovate-configs\
+        -v /tmp/renovate-configs:/workspace/renovate-configs \
         quay.io/konflux-ci/mintmaker-renovate-image:latest \
         renovate-config-validator /workspace/renovate-configs/* > validation.log
+
+        cat validation.log
+        ls -al /tmp/renovate-onfig
 
         if grep -qi "ERROR" validation.log; then
           exit 1
