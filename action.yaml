@@ -45,27 +45,28 @@ runs:
         echo "No config file was set"
         echo "Detecting renovate configuration files..."
 
-        mkdir /tmp/renovate-configs
+        mkdir /opt/renovate-configs
 
         renovate_files=$(find . -name "*renovate.json*")
 
         for f in $renovate_files; do
           if [ -f $f ]; then
             echo "Renovate file detected: $f"
-            cp $f /tmp/renovate-configs
+            cp $f /opt/renovate-configs
           fi
         done 
 
-        if [ -z $(ls /tmp/renovate-configs) ]; then
+        if [ -z $(ls /opt/renovate-configs) ]; then
           echo "No config files found"
           exit 1
         fi
         
-        ls -l /tmp/renovate-configs
         podman run --rm \
-        -v /tmp/renovate-configs:/workspace/renovate-configs \
+        -v /opt/renovate-configs:/workspace/renovate-configs \
         quay.io/konflux-ci/mintmaker-renovate-image:latest \
-        renovate-config-validator /workspace/renovate-configs/* > validation.log
+        renovate-config-validator /workspace/renovate-configs/renovate.json > validation.log
+
+        cat validation.log
 
         cat validation.log
         ls -al /tmp/renovate-onfig

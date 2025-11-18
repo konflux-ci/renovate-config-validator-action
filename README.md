@@ -8,7 +8,7 @@ GitHub Actions for renovate-config-validator, to validate Mintmaker custom confi
 required: false
 
 Renovate Configuration file path.
-By default, the action fetches all `renovate.json` files in the repo.
+By default, the action fetches `renovate.json` file in the repo.
 
 ## Example Workflow
 
