@@ -1,21 +1,21 @@
-name: Validate MintaMaker Configuration with mintmaker-config-validator
+name: Validate MintMaker configuration with renovate-config-validator
 author: Hozifa Wasfy
 branding:
   icon: check
   color: green
 description: |
-  Validate Mintmaker Configuration with renovate-config-validator.
+  Validate MintMaker configuration with renovate-config-validator.
 inputs:
   config_file:
     description: |
-      Renovate Configuration file
-      By default, it Validates every file that match a renovate configuration files. 
+      Renovate configuration file
+      By default, it validates every file that matches renovate configuration files. 
 
     required: false
 runs:
   using: composite
   steps:
-    - name: Validate Renovate Configuration with renovate-config-validator
+    - name: Validate Renovate configuration with renovate-config-validator
       run: |
         set -eu
 
@@ -67,6 +67,9 @@ runs:
         renovate-config-validator /workspace/renovate-configs/renovate.json > validation.log
 
         cat validation.log
+
+        cat validation.log
+        ls -al /tmp/renovate-onfig
 
         if grep -qi "ERROR" validation.log; then
           exit 1
