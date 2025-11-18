@@ -25,6 +25,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./
+      - uses: konflux-ci/renovate-config-validator-action@main
         with:
           config_file: test/renovate.json
