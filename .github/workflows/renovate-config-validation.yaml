@@ -4,6 +4,7 @@ on:
   push:
     branches: 
       - clear-readme
+  pull_request:
    
 jobs:
   config-file-validation:
