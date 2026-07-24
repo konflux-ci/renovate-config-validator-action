@@ -12,12 +12,26 @@ inputs:
       By default, it validates every file that matches renovate configuration files. 
 
     required: false
+  strict:
+    description: |
+      Pass --strict to renovate-config-validator so validation also fails when
+      a scanned config needs migration.
+    required: false
+    default: "false"
 runs:
   using: composite
   steps:
     - name: Validate Renovate configuration with renovate-config-validator
       run: |
         set -eu
+
+        log_file="${GITHUB_WORKSPACE}/validation.log"
+
+        validator_args=()
+        if [ "$STRICT" = "true" ]; then
+          validator_args+=(--strict)
+          echo "Strict mode enabled"
+        fi
 
         if [ -n "$CONFIG_FILE_PATH" ] && [ -f "$CONFIG_FILE_PATH" ]; then
           echo "Validating config_file: " "$CONFIG_FILE_PATH"
@@ -30,8 +44,8 @@ runs:
           podman run --rm \
           -v $config_path:/workspace/renovate.json:ro,Z \
           quay.io/konflux-ci/mintmaker-renovate-image:latest \
-          renovate-config-validator /workspace/renovate.json 2>&1 | tee validation.log
-          exit_code=$?
+          renovate-config-validator "${validator_args[@]}" /workspace/renovate.json 2>&1 | tee "$log_file"
+          exit_code=${PIPESTATUS[0]}
           set -e  # Re-enable exit on error
 
           echo "finished validating with exit code: $exit_code"
@@ -71,8 +85,8 @@ runs:
         podman run --rm \
         -v /opt/renovate-configs:/workspace/renovate-configs \
         quay.io/konflux-ci/mintmaker-renovate-image:latest \
-        renovate-config-validator /workspace/renovate-configs/renovate.json 2>&1 | tee validation.log
-        exit_code=$?
+        renovate-config-validator "${validator_args[@]}" /workspace/renovate-configs/renovate.json 2>&1 | tee "$log_file"
+        exit_code=${PIPESTATUS[0]}
         set -e  # Re-enable exit on error
 
         echo "finished validating with exit code: $exit_code"
@@ -89,3 +103,4 @@ runs:
       shell: bash
       env:
         CONFIG_FILE_PATH: ${{inputs.config_file}}
+        STRICT: ${{inputs.strict}}
