@@ -2,13 +2,21 @@
 
 GitHub Actions for renovate-config-validator, to validate Mintmaker custom configs.
 
-## Input
+## Inputs
+
 ### `config_file`
 
 required: false
 
-Renovate Configuration file path.
-By default, the action fetches `renovate.json` file in the repo.
+Renovate configuration file path.
+By default, the action fetches `renovate.json` in the repo.
+
+### `strict`
+
+required: false  
+default: `false`
+
+Pass `--strict` to `renovate-config-validator` so validation also fails when a scanned config needs migration.
 
 ## Example Workflow
 
@@ -28,3 +36,4 @@ jobs:
       - uses: konflux-ci/renovate-config-validator-action@main
         with:
           config_file: test/renovate.json
+          strict: true
